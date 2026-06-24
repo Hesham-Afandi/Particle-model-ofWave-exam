@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💡 Grade 12 Advanced Physics - The Quantum Blueprint (Unit 1)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        body.en-mode { font-family: 'Inter', sans-serif; }
+        .correct { background-color: #dcfce7 !important; border-color: #16a34a !important; }
+        .incorrect { background-color: #fee2e2 !important; border-color: #dc2626 !important; }
+        .math { font-family: 'Times New Roman', serif; letter-spacing: 0.5px; direction: ltr; display: inline-block; font-style: italic; }
+        .timer-warning { color: #dc2626 !important; animation: pulse 1s infinite; }
+        @keyframes pulse { 50% { opacity: 0.7; } }
+        @media print { .no-print { display: none !important; } }
+        .success-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.875rem; }
+        .grade-excellent { background: #dcfce7; color: #166534; }
+        .grade-good { background: #fef3c7; color: #92400e; }
+        .grade-pass { background: #dbeafe; color: #1e40af; }
+        .grade-fail { background: #fee2e2; color: #991b1b; }
+        .lang-switch {
+            position: fixed; top: 16px; left: 16px; z-index: 100;
+            background: white; padding: 6px; border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: flex; gap: 4px;
+            border: 2px solid #0d9488;
+        }
+        [dir="ltr"] .lang-switch { left: auto; right: 16px; }
+        .lang-btn {
+            padding: 6px 14px; border-radius: 20px; cursor: pointer; font-weight: bold;
+            transition: all 0.3s; border: none; font-size: 0.875rem;
+            background: transparent; color: #6b7280;
+        }
+        .lang-btn.active { background: #0d9488; color: white; box-shadow: 0 2px 6px rgba(13,148,136,0.4); }
+        .lang-btn:hover:not(.active) { background: #f0fdfa; color: #0d9488; }
+        .shuffle-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 p-4 md:p-8 min-h-screen">
+
+    <div class="lang-switch no-print">
+        <button class="lang-btn active" onclick="setLanguage('ar')" id="btn-ar">عربي</button>
+        <button class="lang-btn" onclick="setLanguage('en')" id="btn-en">EN</button>
+    </div>
+
+    <div id="timer-container" class="max-w-4xl mx-auto mb-4 text-center no-print">
+        <div class="bg-white p-4 rounded-xl shadow-md inline-block border-2 border-teal-100">
+            <span class="text-gray-600 ml-2" data-ar="⏱️ الوقت المتبقي:" data-en="⏱️ Time Remaining:">⏱️ الوقت المتبقي:</span>
+            <span id="timer" class="text-2xl font-bold text-teal-600 font-mono">60:00</span>
+            <span class="shuffle-badge" data-ar="🔀 أسئلة عشوائية" data-en="🔀 Random Questions">🔀 أسئلة عشوائية</span>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto mb-6 flex flex-wrap gap-3 justify-center no-print">
+        <button onclick="toggleAnswers()" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-lg font-medium transition shadow cursor-pointer" data-ar="👁️ إظهار / إخفاء الإجابات" data-en="👁️ Show / Hide Answers">👁️ إظهار / إخفاء الإجابات</button>
+        <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2 rounded-lg font-medium transition shadow cursor-pointer" data-ar="🖨️ طباعة / PDF" data-en="🖨️ Print / PDF">🖨️ طباعة / PDF</button>
+        <button onclick="reshuffleExam()" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-5 py-2 rounded-lg font-medium transition shadow cursor-pointer" data-ar="🔀 إعادة خلط الأسئلة" data-en="🔀 Reshuffle Questions">🔀 إعادة خلط الأسئلة</button>
+    </div>
+
+    <header class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-md mb-8 border-r-4 border-teal-600">
+        <div class="text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2" data-ar="💡 فيزياء الصف الثاني عشر متقدم - Inspire" data-en="💡 Grade 12 Advanced Physics - Inspire">💡 فيزياء الصف الثاني عشر متقدم - Inspire</h1>
+            <h2 class="text-lg text-teal-600 font-semibold" data-ar="الوحدة الأولى: ولادة النظرية الكمية" data-en="Unit 1: The Birth of Quantum Theory">الوحدة الأولى: ولادة النظرية الكمية</h2>
+            <p class="text-sm text-gray-600 mt-2" data-ar="الأزمات الكلاسيكية، تكميم الطاقة، التأثير الكهروضوئي، الفوتونات، وتأثير كومبتون" data-en="Classical Crises, Energy Quantization, Photoelectric Effect, Photons & Compton Effect">الأزمات الكلاسيكية، تكميم الطاقة، التأثير الكهروضوئي، الفوتونات، وتأثير كومبتون</p>
+            <p class="text-xs text-orange-600 mt-2 font-semibold" data-ar="⚠️ ملاحظة: يتم خلط ترتيب الأسئلة والخيارات تلقائياً مع كل تحديث للصفحة" data-en="⚠️ Note: Questions and options are randomly shuffled on every page refresh">⚠️ ملاحظة: يتم خلط ترتيب الأسئلة والخيارات تلقائياً مع كل تحديث للصفحة</p>
+        </div>
+        <div class="mt-4 flex flex-wrap justify-center gap-4 text-sm text-gray-600">
+            <span><span data-ar="📅 التاريخ:" data-en="📅 Date:">📅 التاريخ:</span> <input type="text" class="border-b border-gray-400 bg-transparent w-28 text-center"></span>
+            <span><span data-ar="👤 الاسم:" data-en="👤 Name:">👤 الاسم:</span> <input type="text" id="studentName" class="border-b border-gray-400 bg-transparent w-32 text-center" placeholder="Enter name"></span>
+            <span><span data-ar="🏫 الشعبة:" data-en="🏫 Class:">🏫 الشعبة:</span> <input type="text" id="studentClass" class="border-b border-gray-400 bg-transparent w-28 text-center" placeholder="Class"></span>
+            <span><span data-ar="⏱️ المدة: 60 دقيقة" data-en="⏱️ Duration: 60 min">⏱️ المدة: 60 دقيقة</span></span>
+            <span><span data-ar="📊 المجموع: 100 درجة" data-en="📊 Total: 100 pts">📊 المجموع: 100 درجة</span></span>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto space-y-8" id="exam-content"></main>
+
+    <div class="text-center no-print pb-8 mt-8">
+        <button onclick="gradeExam()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-lg px-10 py-4 rounded-xl font-bold shadow-xl transition transform hover:scale-105 cursor-pointer" data-ar="📝 تسليم وتصحيح الامتحان" data-en="📝 Submit & Grade Exam">📝 تسليم وتصحيح الامتحان</button>
+    </div>
+
+    <div id="results-panel" class="max-w-4xl mx-auto mt-8 bg-white p-8 rounded-2xl shadow-2xl border-t-4 border-emerald-500 hidden no-print">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center" data-ar="📊 نتائج الامتحان" data-en="📊 Exam Results">📊 نتائج الامتحان</h2>
+        <div class="grid md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-blue-50 p-4 rounded-xl text-center"><p data-ar="اسم الطالب" data-en="Student Name">اسم الطالب</p><p id="res-name" class="font-bold text-xl text-teal-700">-</p></div>
+            <div class="bg-purple-50 p-4 rounded-xl text-center"><p data-ar="التاريخ" data-en="Date">التاريخ</p><p id="res-date" class="font-bold text-xl text-purple-700">-</p></div>
+            <div class="bg-emerald-50 p-4 rounded-xl text-center"><p data-ar="المجموع" data-en="Score">المجموع</p><p id="res-total" class="font-bold text-3xl text-emerald-600">0 / 100</p></div>
+        </div>
+        <div class="text-center mb-6">
+            <span id="success-badge" class="success-badge grade-excellent">-</span>
+            <p id="success-percent" class="text-4xl font-bold text-emerald-600 mt-2">100%</p>
+            <p class="text-sm text-gray-500" data-ar="نسبة النجاح" data-en="Success Rate">نسبة النجاح</p>
+        </div>
+        <div class="bg-gray-50 p-6 rounded-xl mb-6">
+            <h3 class="font-bold text-lg mb-4 text-gray-800" data-ar="📈 تفصيل الأداء حسب القسم:" data-en="📈 Performance Breakdown:">📈 تفصيل الأداء حسب القسم:</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="الأزمة الأولى: الطاقة اللانهائية" data-en="The First Crisis: Infinite Energy">الأزمة الأولى: الطاقة اللانهائية</span><span id="sec1-score" class="font-bold text-teal-600">0/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="حل بلانك الجذري: تكميم الطاقة" data-en="Planck's Radical Fix: Quantized Energy">حل بلانك الجذري: تكميم الطاقة</span><span id="sec2-score" class="font-bold text-teal-600">0/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="الأزمة الثانية: التأثير الكهروضوئي" data-en="The Second Crisis: Photoelectric Effect">الأزمة الثانية: التأثير الكهروضوئي</span><span id="sec3-score" class="font-bold text-teal-600">0/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="حل أينشتاين: الفوتونات" data-en="Einstein's Solution: Photons">حل أينشتاين: الفوتونات</span><span id="sec4-score" class="font-bold text-teal-600">0/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="إثباتات إضافية: كومبتون وازدواجية الموجة-الجسيم" data-en="Additional Proofs: Compton & Wave-Particle Duality">إثباتات إضافية: كومبتون وازدواجية الموجة-الجسيم</span><span id="sec5-score" class="font-bold text-teal-600">0/4</span></div>
+            </div>
+        </div>
+        <div class="text-center mb-6">
+            <button id="sendEmailBtn" onclick="sendResultsToEmail()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white text-lg px-8 py-3 rounded-xl font-bold shadow-xl transition transform hover:scale-105 cursor-pointer" data-ar="📧 إرسال النتائج للمعلم" data-en="📧 Send Results to Teacher">📧 إرسال النتائج للمعلم</button>
+            <p id="emailStatus" class="text-sm mt-2 text-center font-medium"></p>
+        </div>
+        <div class="flex gap-3 justify-center">
+            <button onclick="window.print()" class="bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold" data-ar="🖨️ طباعة النتائج" data-en="🖨️ Print Results">🖨️ طباعة النتائج</button>
+        </div>
+    </div>
+
+    <footer class="max-w-4xl mx-auto mt-10 mb-8 text-center text-gray-500 text-sm no-print">
+        © <span data-ar="الفيزياء للصف 12 متقدم - Inspire | الوحدة الأولى: النظرية الكمية" data-en="Grade 12 Advanced Physics - Inspire | Unit 1: Quantum Theory">الفيزياء للصف 12 متقدم - Inspire | الوحدة الأولى: النظرية الكمية</span> | Mr. Mohammed Hesham
+    </footer>
+
+<script>
+// ==================== بيانات الامتحان الأصلية ====================
+const originalExamData = {
+    sections: [
+        {
+            id: 'sec1',
+            title: { ar: '🔹 الجزء الأول: الأزمة الأولى - الطاقة اللانهائية', en: '🔹 Part 1: The First Crisis - Infinite Energy' },
+            questions: [
+                { q: { ar: 'ماذا توقعت النظرية الكلاسيجية للموجات الكهرومغناطيسية عام 1900 بالنسبة للأجسام الساخنة؟', en: 'What did classical electromagnetic wave theory predict in 1900 about hot objects?' }, options: [{ ar: 'ستشع طاقة محدودة عند الترددات العالية', en: 'They would radiate limited energy at high frequencies' }, { ar: 'ستشع طاقة لا نهائية عند الترددات العالية', en: 'They would radiate infinite energy at high frequencies' }, { ar: 'لن تشع أي طاقة على الإطلاق', en: 'They would not radiate any energy at all' }, { ar: 'ستشع طاقة ثابتة عند جميع الترددات', en: 'They would radiate constant energy at all frequencies' }], correct: 1, answer: { ar: 'التوقع الكلاسيكي: طاقة لا نهائية عند الترددات العالية - وهو أمر مستحيل فيزيائياً', en: 'Classical prediction: infinite energy at high frequencies - which is physically impossible' } },
+                { q: { ar: 'ماذا أظهرت التجارب الفعلية لإشعاع الجسم الأسود؟', en: 'What did actual experiments of blackbody radiation show?' }, options: [{ ar: 'الطاقة تزداد باستمرار مع التردد', en: 'Energy continuously increases with frequency' }, { ar: 'الطاقة تصل إلى قمة ثم تنخفض بشدة', en: 'Energy reaches a peak then drops off sharply' }, { ar: 'الطاقة ثابتة عند جميع الترددات', en: 'Energy is constant at all frequencies' }, { ar: 'الطاقة تنخفض دائماً مع التردد', en: 'Energy always decreases with frequency' }], correct: 1, answer: { ar: 'التجارب أظهرت أن الطاقة تصل إلى قمة ثم تنخفض - مما يناقض التوقع النظري', en: 'Experiments showed energy peaks then drops - contradicting the theoretical prediction' } },
+                { q: { ar: 'ما المشكلة الأساسية في التوقع الكلاسيكي لإشعاع الجسم الأسود؟', en: 'What is the fundamental problem with the classical prediction of blackbody radiation?' }, options: [{ ar: 'يتجاهل تأثير الجاذبية', en: 'It ignores gravitational effects' }, { ar: 'يتنبأ بطاقة لا نهائية - وهو أمر مستحيل فيزيائياً', en: 'It predicts infinite energy - which is physically impossible' }, { ar: 'لا يأخذ في الاعتبار درجة الحرارة', en: 'It does not consider temperature' }, { ar: 'يفترض أن الضوء جسيمات فقط', en: 'It assumes light is only particles' }], correct: 1, answer: { ar: 'المشكلة: التوقع الرياضي بطاقة لا نهائية عند الترددات العالية - وهذا مستحيل فيزيائياً', en: 'The problem: mathematical prediction of infinite energy at high frequencies - physically impossible' } },
+                { q: { ar: 'ماذا يحدث لتردد الذروة (peak frequency) لإشعاع الجسم الأسود مع ارتفاع درجة الحرارة؟', en: 'What happens to the peak frequency of blackbody radiation as temperature increases?' }, options: [{ ar: 'يبقى ثابتاً', en: 'Remains constant' }, { ar: 'ينزح نحو الترددات الأعلى', en: 'Shifts toward higher frequencies' }, { ar: 'ينزح نحو الترددات الأقل', en: 'Shifts toward lower frequencies' }, { ar: 'يصبح صفراً', en: 'Becomes zero' }], correct: 1, answer: { ar: 'مع ارتفاع الحرارة (4000K → 5800K → 8000K)، ينزح تردد الذروة نحو الأعلى', en: 'As temperature rises (4000K → 5800K → 8000K), peak frequency shifts higher' } }
+            ]
+        },
+        {
+            id: 'sec2',
+            title: { ar: '🔹 الجزء الثاني: حل بلانك الجذري - تكميم الطاقة', en: '🔹 Part 2: Planck\'s Radical Fix - Energy Quantization' },
+            questions: [
+                { q: { ar: 'ما المعادلة الأساسية التي اقترحها ماكس بلانك لحل أزمة إشعاع الجسم الأسود؟', en: 'What is the fundamental equation Max Planck proposed to solve the blackbody crisis?' }, options: [{ ar: '<span class="math">E = mc²</span>', en: '<span class="math">E = mc²</span>' }, { ar: '<span class="math">E = nhf</span>', en: '<span class="math">E = nhf</span>' }, { ar: '<span class="math">E = hf²</span>', en: '<span class="math">E = hf²</span>' }, { ar: '<span class="math">E = n/h</span>', en: '<span class="math">E = n/h</span>' }], correct: 1, answer: { ar: 'معادلة بلانك: E = nhf، حيث الطاقة تأتي في حزم منفصلة (كمّات)', en: 'Planck\'s equation: E = nhf, where energy comes in discrete bundles (quanta)' } },
+                { q: { ar: 'ما قيمة ثابت بلانك (h)؟', en: 'What is the value of Planck\'s constant (h)?' }, options: [{ ar: '<span class="math">6.63 × 10⁻³⁴ J·Hz⁻¹</span>', en: '<span class="math">6.63 × 10⁻³⁴ J·Hz⁻¹</span>' }, { ar: '<span class="math">3.00 × 10⁸ J·s</span>', en: '<span class="math">3.00 × 10⁸ J·s</span>' }, { ar: '<span class="math">1.60 × 10⁻¹⁹ J</span>', en: '<span class="math">1.60 × 10⁻¹⁹ J</span>' }, { ar: '<span class="math">9.11 × 10⁻³¹ kg</span>', en: '<span class="math">9.11 × 10⁻³¹ kg</span>' }], correct: 0, answer: { ar: 'ثابت بلانك: h = 6.63 × 10⁻³⁴ J·Hz⁻¹', en: 'Planck\'s constant: h = 6.63 × 10⁻³⁴ J·Hz⁻¹' } },
+                { q: { ar: 'ما الفرق الجوهري بين النظرية الكلاسيكية ونظرية بلانك؟', en: 'What is the fundamental difference between classical theory and Planck\'s theory?' }, options: [{ ar: 'الطاقة مستمرة في الحالتين', en: 'Energy is continuous in both cases' }, { ar: 'الكلاسيكية: طاقة مستمرة، بلانك: طاقة مُكَمّاة (حزم منفصلة)', en: 'Classical: continuous energy, Planck: quantized energy (discrete packets)' }, { ar: 'بلانك رفض وجود الذرات', en: 'Planck rejected the existence of atoms' }, { ar: 'الكلاسيكية افترضت طاقة مُكَمّاة', en: 'Classical assumed quantized energy' }], correct: 1, answer: { ar: 'الكلاسيكية: الطاقة مستمرة (مثل الصعود على منحدر)، بلانك: الطاقة مُكَمّاة (مثل صعود الدرج)', en: 'Classical: continuous energy (like a ramp), Planck: quantized (like stairs)' } },
+                { q: { ar: 'في معادلة بلانك <span class="math">E = nhf</span>، ماذا يمثل الرمز n؟', en: 'In Planck\'s equation <span class="math">E = nhf</span>, what does the symbol n represent?' }, options: [{ ar: 'تردد الموجة', en: 'Wave frequency' }, { ar: 'عدد صحيح (1, 2, 3, ...)', en: 'An integer (1, 2, 3, ...)' }, { ar: 'ثابت بلانك', en: 'Planck\'s constant' }, { ar: 'أي قيمة كسرية', en: 'Any fractional value' }], correct: 1, answer: { ar: 'n عدد صحيح فقط - لا يسمح بالقيم الكسرية، وهذا جوهر التكميم', en: 'n is only an integer - fractional values not allowed, this is the essence of quantization' } }
+            ]
+        },
+        {
+            id: 'sec3',
+            title: { ar: '🔹 الجزء الثالث: الأزمة الثانية - التأثير الكهروضوئي', en: '🔹 Part 3: The Second Crisis - Photoelectric Effect' },
+            questions: [
+                { q: { ar: 'في التأثير الكهروضوئي، ماذا يحدث عند سقوط ضوء عالي التردد (فوق البنفسجي) على صفيحة معدنية؟', en: 'In the photoelectric effect, what happens when high-frequency (UV) light hits a metal plate?' }, options: [{ ar: 'تسخن الصفيحة فقط دون تحرير إلكترونات', en: 'The plate heats up only without ejecting electrons' }, { ar: 'تتحرر الإلكترونات فوراً ويتدفق تيار', en: 'Electrons eject instantly and current flows' }, { ar: 'تتحرر الإلكترونات بعد فترة طويلة', en: 'Electrons eject after a long time' }, { ar: 'لا يحدث شيء على الإطلاق', en: 'Nothing happens at all' }], correct: 1, answer: { ar: 'الضوء عالي التردد يحرر الإلكترونات فوراً - والتيار يتدفق', en: 'High-frequency light ejects electrons instantly - current flows' } },
+                { q: { ar: 'ماذا يحدث عند سقوط ضوء منخفض التردد (أحمر مرئي) على المعدن، مهما كانت شدة الإضاءة؟', en: 'What happens when low-frequency (visible red) light hits the metal, regardless of intensity?' }, options: [{ ar: 'تتحرر إلكترونات كثيرة بسبب الشدة العالية', en: 'Many electrons eject due to high intensity' }, { ar: 'لا تتحرر أي إلكترونات على الإطلاق', en: 'No electrons eject at all' }, { ar: 'تتحرر إلكترونات بعد وقت طويل', en: 'Electrons eject after a long time' }, { ar: 'تتحرر إلكترونات بطاقة عالية', en: 'Electrons eject with high energy' }], correct: 1, answer: { ar: 'مهما كانت الإضاءة ساطعة، لا إلكترونات تتحرر إذا كان التردد أقل من العتبة', en: 'No matter how bright, no electrons eject if frequency is below threshold' } },
+                { q: { ar: 'وفقاً للواقع الكمي، ماذا يحدد عدد الإلكترونات المتحررة في التأثير الكهروضوئي؟', en: 'According to quantum reality, what determines the number of ejected electrons in the photoelectric effect?' }, options: [{ ar: 'تردد الضوء فقط', en: 'Light frequency only' }, { ar: 'شدة الضوء (فقط إذا كان فوق التردد العتبي)', en: 'Light intensity (only if above threshold frequency)' }, { ar: 'درجة حرارة المعدن', en: 'Metal temperature' }, { ar: 'سمك الصفيحة المعدنية', en: 'Thickness of the metal plate' }], correct: 1, answer: { ar: 'الشدة تغير عدد الإلكترونات، ولكن فقط إذا كان الضوء فوق تردد العتبة f₀', en: 'Intensity changes number of electrons, but only if light is above threshold frequency f₀' } },
+                { q: { ar: 'وفقاً للواقع الكمي، ماذا يحدد الطاقة الحركية للإلكترونات المتحررة؟', en: 'According to quantum reality, what determines the kinetic energy of ejected electrons?' }, options: [{ ar: 'شدة الضوء (السطوع)', en: 'Light intensity (brightness)' }, { ar: 'تردد الضوء الأعلى فقط', en: 'Only higher frequency of light' }, { ar: 'مساحة الصفيحة المعدنية', en: 'Area of the metal plate' }, { ar: 'زمن التعرض للضوء', en: 'Exposure time to light' }], correct: 1, answer: { ar: 'السطوع لا يؤثر، فقط التردد الأعلى يزيد الطاقة الحركية للإلكترونات', en: 'Brightness has no effect, only higher frequency increases kinetic energy of electrons' } }
+            ]
+        },
+        {
+            id: 'sec4',
+            title: { ar: '🔹 الجزء الرابع: حل أينشتاين - الفوتونات', en: '🔹 Part 4: Einstein\'s Solution - Photons' },
+            questions: [
+                { q: { ar: 'ما الذي اقترحه ألبرت أينشتاين عام 1905 لحل لغز التأثير الكهروضوئي؟', en: 'What did Albert Einstein propose in 1905 to solve the photoelectric puzzle?' }, options: [{ ar: 'الضوء موجات مستمرة فقط', en: 'Light is only continuous waves' }, { ar: 'الضوء نفسه يسافر في حزم منفصلة عديمة الكتلة تسمى الفوتونات', en: 'Light itself travels in discrete, massless bundles called photons' }, { ar: 'الإلكترونات لا توجد في المعادن', en: 'Electrons do not exist in metals' }, { ar: 'الضوء لا يحمل طاقة', en: 'Light carries no energy' }], correct: 1, answer: { ar: 'أينشتاين اقترح أن الضوء نفسه جسيمات (فوتونات) - ليس مجرد خدعة رياضية للذرات', en: 'Einstein proposed light itself is particles (photons) - not just a math trick for atoms' } },
+                { q: { ar: 'ما التفاعل بين الفوتون والإلكترون في التأثير الكهروضوئي؟', en: 'What is the interaction between a photon and an electron in the photoelectric effect?' }, options: [{ ar: 'فوتون واحد يتفاعل مع عدة إلكترونات', en: 'One photon interacts with multiple electrons' }, { ar: 'فوتون واحد يتفاعل مع إلكترون واحد بالضبط', en: 'One photon interacts with exactly one electron' }, { ar: 'عدة فوتونات تتفاعل مع إلكترون واحد', en: 'Multiple photons interact with one electron' }, { ar: 'لا يوجد تفاعل بينهما', en: 'No interaction between them' }], correct: 1, answer: { ar: 'تفاعل واحد لواحد: فوتون واحد ↔ إلكترون واحد بالضبط', en: 'One-to-one interaction: one photon ↔ exactly one electron' } },
+                { q: { ar: 'ما معادلة الطاقة الحركية للإلكترون المتحرر في التأثير الكهروضوئي؟', en: 'What is the equation for the kinetic energy of an ejected electron in the photoelectric effect?' }, options: [{ ar: '<span class="math">KE = hf + hf₀</span>', en: '<span class="math">KE = hf + hf₀</span>' }, { ar: '<span class="math">KE = hf - hf₀</span>', en: '<span class="math">KE = hf - hf₀</span>' }, { ar: '<span class="math">KE = hf × hf₀</span>', en: '<span class="math">KE = hf × hf₀</span>' }, { ar: '<span class="math">KE = h/f</span>', en: '<span class="math">KE = h/f</span>' }], correct: 1, answer: { ar: 'KE = hf - hf₀: الطاقة الحركية = طاقة الفوتون - دالة الشغل', en: 'KE = hf - hf₀: kinetic energy = photon energy - work function' } },
+                { q: { ar: 'ماذا يمثل الرمز f₀ في معادلة التأثير الكهروضوئي؟', en: 'What does the symbol f₀ represent in the photoelectric equation?' }, options: [{ ar: 'تردد الضوء الساقط', en: 'Frequency of incident light' }, { ar: 'تردد العتبة (الحد الأدنى لتحرير الإلكترون)', en: 'Threshold frequency (minimum to free the electron)' }, { ar: 'تردد الذروة لإشعاع الجسم الأسود', en: 'Peak frequency of blackbody radiation' }, { ar: 'تردد الرنين للذرة', en: 'Resonance frequency of the atom' }], correct: 1, answer: { ar: 'f₀ هو تردد العتبة - الحد الأدنى من التردد اللازم لتحرير الإلكترون من المعدن', en: 'f₀ is the threshold frequency - minimum frequency needed to free the electron from the metal' } }
+            ]
+        },
+        {
+            id: 'sec5',
+            title: { ar: '🔹 الجزء الخامس: إثباتات إضافية - كومبتون وازدواجية الموجة-الجسيم', en: '🔹 Part 5: Additional Proofs - Compton & Wave-Particle Duality' },
+            questions: [
+                { q: { ar: 'ما الذي أثبته آرثر كومبتون عام 1922 من خلال تجاربه على أشعة X؟', en: 'What did Arthur Compton prove in 1922 through his X-ray experiments?' }, options: [{ ar: 'أن الضوء موجات فقط', en: 'That light is only waves' }, { ar: 'أن الفوتونات تمتلك زخماً وتتصرف كجسيمات مادية', en: 'That photons have momentum and behave like physical particles' }, { ar: 'أن الإلكترونات لا تمتلك كتلة', en: 'That electrons have no mass' }, { ar: 'أن أشعة X لا تحمل طاقة', en: 'That X-rays carry no energy' }], correct: 1, answer: { ar: 'كومبتون أثبت أن فوتونات أشعة X تصطدم بالإلكترونات وتنقل زخماً - تماماً ككرات البلياردو', en: 'Compton proved X-ray photons collide with electrons and transfer momentum - just like billiard balls' } },
+                { q: { ar: 'ما الذي لوحظ في تجربة كومبتون للفوتون المشتت؟', en: 'What was observed in Compton\'s experiment for the scattered photon?' }, options: [{ ar: 'ظل الطول الموجي كما هو', en: 'The wavelength remained the same' }, { ar: 'الفوتون المشتت له طول موجي أطول noticeably', en: 'The scattered photon has a noticeably longer wavelength' }, { ar: 'الفوتون المشتت له طول موجي أقصر', en: 'The scattered photon has a shorter wavelength' }, { ar: 'الفوتون اختفى تماماً', en: 'The photon disappeared completely' }], correct: 1, answer: { ar: 'الفوتون المشتت له طول موجي أطول (λ\' > λ) - مما يعني أنه فقد طاقة للإلكترون', en: 'Scattered photon has longer wavelength (λ\' > λ) - meaning it lost energy to the electron' } },
+                { q: { ar: 'ما معادلة زخم الفوتون؟', en: 'What is the equation for the momentum of a photon?' }, options: [{ ar: '<span class="math">p = mv</span>', en: '<span class="math">p = mv</span>' }, { ar: '<span class="math">p = h/λ</span>', en: '<span class="math">p = h/λ</span>' }, { ar: '<span class="math">p = hf²</span>', en: '<span class="math">p = hf²</span>' }, { ar: '<span class="math">p = mc²</span>', en: '<span class="math">p = mc²</span>' }], correct: 1, answer: { ar: 'زخم الفوتون: p = h/λ - مخزّن بالكامل في طوله الموجي (لأنه عديم الكتلة)', en: 'Photon momentum: p = h/λ - stored entirely in its wavelength (since it is massless)' } },
+                { q: { ar: 'ما المقصود بازدواجية الموجة-الجسيم للضوء؟', en: 'What is meant by the wave-particle duality of light?' }, options: [{ ar: 'الضوء موجات فقط في جميع الحالات', en: 'Light is only waves in all cases' }, { ar: 'الضوء ينتقل كموجة مستمرة، لكنه يتفاعل مع المادة كجسيم منفصل', en: 'Light travels as a continuous wave, but interacts with matter as a discrete particle' }, { ar: 'الضوء جسيمات فقط في جميع الحالات', en: 'Light is only particles in all cases' }, { ar: 'الضوء لا موجات ولا جسيمات', en: 'Light is neither waves nor particles' }], correct: 1, answer: { ar: 'الازدواجية: الضوء يسلك سلوك الموجة في الانتشار، وسلوك الجسيم في التفاعل مع المادة', en: 'Duality: light behaves as a wave in propagation, and as a particle in interaction with matter' } }
+            ]
+        }
+    ]
+};
+
+// ==================== دالة الخلط (Fisher-Yates Shuffle) ====================
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+// ==================== تحضير البيانات مع الخلط ====================
+let examData;
+let correctAnswersMap = {};
+
+function prepareShuffledExam() {
+    examData = JSON.parse(JSON.stringify(originalExamData));
+    correctAnswersMap = {};
+    
+    let globalIdx = 1;
+    
+    examData.sections.forEach((section) => {
+        section.questions = shuffleArray(section.questions);
+        
+        section.questions.forEach((q) => {
+            const optionsWithCorrect = q.options.map((opt, idx) => ({
+                option: opt,
+                isCorrect: idx === q.correct
+            }));
+            
+            const shuffledOptions = shuffleArray(optionsWithCorrect);
+            q.options = shuffledOptions.map(o => o.option);
+            
+            const newCorrectIndex = shuffledOptions.findIndex(o => o.isCorrect);
+            q.correct = newCorrectIndex;
+            
+            correctAnswersMap[globalIdx] = String.fromCharCode(97 + newCorrectIndex);
+            globalIdx++;
+        });
+    });
+    
+    console.log('✅ تم خلط الأسئلة والخيارات بنجاح');
+    console.log('📋 الإجابات الصحيحة بعد الخلط:', correctAnswersMap);
+}
+
+// ==================== إعادة الخلط يدوياً ====================
+function reshuffleExam() {
+    prepareShuffledExam();
+    renderExam();
+    document.querySelectorAll('input[type="radio"]:checked').forEach(r => r.checked = false);
+    document.getElementById('results-panel').classList.add('hidden');
+    document.querySelectorAll('.correct, .incorrect').forEach(el => {
+        el.classList.remove('correct', 'incorrect');
+    });
+    alert(currentLang === 'ar' 
+        ? '🔀 تم إعادة خلط الأسئلة والخيارات بنجاح!' 
+        : '🔀 Questions and options have been reshuffled successfully!');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ==================== متغيرات عامة ====================
+let currentLang = 'ar';
+let timeRemaining = 3600;
+let timerInterval;
+
+// ==================== تبديل اللغة ====================
+function setLanguage(lang) {
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.body.classList.toggle('en-mode', lang === 'en');
+    document.querySelectorAll('[data-ar][data-en]').forEach(el => {
+        el.textContent = el.getAttribute(`data-${lang}`);
+    });
+    renderExam();
+}
+
+// ==================== عرض الامتحان ====================
+function renderExam() {
+    const container = document.getElementById('exam-content');
+    const labels = {
+        ar: { option: ['أ', 'ب', 'ج', 'د'], answer: '✅ الإجابة:' },
+        en: { option: ['A', 'B', 'C', 'D'], answer: '✅ Answer:' }
+    };
+    const lbl = labels[currentLang];
+    const isRTL = currentLang === 'ar';
+
+    let html = '';
+    let globalIdx = 1;
+
+    examData.sections.forEach((section) => {
+        html += `<section class="bg-white p-6 rounded-xl shadow-lg">
+            <h2 class="text-xl font-bold mb-4 text-teal-700">${section.title[currentLang]}</h2>
+            <ol class="space-y-4 text-sm">`;
+
+        section.questions.forEach((q) => {
+            const borderSide = isRTL ? 'border-r-4 pr-4' : 'border-l-4 pl-4';
+            html += `<li class="${borderSide} border-teal-500 py-2" id="q-${globalIdx}">
+                <strong>${globalIdx}.</strong> ${q.q[currentLang]}<br>`;
+
+            q.options.forEach((opt, oIdx) => {
+                const radioSide = isRTL ? 'mr-4 ml-2' : 'ml-4 mr-2';
+                html += `<label class="cursor-pointer block mt-1 ${isRTL ? 'mr-4' : 'ml-4'}">
+                    <input type="radio" name="q${globalIdx}" value="${String.fromCharCode(97 + oIdx)}" class="${radioSide}">
+                    ${lbl.option[oIdx]}) ${opt[currentLang]}
+                </label>`;
+            });
+
+            html += `<div class="answer-box text-green-700 mt-2 font-medium hidden">
+                ${lbl.answer} ${lbl.option[q.correct]}) ${q.options[q.correct][currentLang]} — ${q.answer[currentLang]}
+            </div></li>`;
+            globalIdx++;
+        });
+
+        html += `</ol></section>`;
+    });
+
+    container.innerHTML = html;
+}
+
+// ==================== المؤقت ====================
+function startTimer() {
+    document.getElementById('timer-container').style.display = 'block';
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        const timerEl = document.getElementById('timer');
+        timerEl.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        if (timeRemaining <= 300) timerEl.classList.add('timer-warning');
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            alert(currentLang === 'ar' ? "انتهى الوقت! سيتم تسليم الامتحان تلقائياً." : "Time's up!");
+            gradeExam();
+        }
+    }, 1000);
+}
+
+// ==================== إظهار/إخفاء الإجابات ====================
+function toggleAnswers() {
+    document.querySelectorAll('.answer-box').forEach(el => el.classList.toggle('hidden'));
+}
+
+// ==================== تصحيح الامتحان ====================
+function gradeExam() {
+    let correctCount = 0;
+    let sec1=0, sec2=0, sec3=0, sec4=0, sec5=0;
+
+    for (let i = 1; i <= 20; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        const li = document.getElementById(`q-${i}`);
+        const correctAnswer = correctAnswersMap[i];
+        const isCorrect = selected && selected.value === correctAnswer;
+
+        if (isCorrect) {
+            correctCount++;
+            li.classList.add('correct');
+            li.classList.remove('incorrect');
+            if (i <= 4) sec1++;
+            else if (i <= 8) sec2++;
+            else if (i <= 12) sec3++;
+            else if (i <= 16) sec4++;
+            else sec5++;
+        } else {
+            li.classList.add('incorrect');
+            li.classList.remove('correct');
+        }
+    }
+
+    const score = (correctCount / 20) * 100;
+    const successRate = Math.round(score);
+
+    document.getElementById('res-total').textContent = `${Math.round(score)} / 100`;
+    document.getElementById('res-name').textContent = document.getElementById('studentName').value || (currentLang === 'ar' ? 'طالب' : 'Student');
+    document.getElementById('res-date').textContent = new Date().toLocaleDateString(currentLang === 'ar' ? 'ar-AE' : 'en-US');
+    document.getElementById('sec1-score').textContent = `${sec1}/4`;
+    document.getElementById('sec2-score').textContent = `${sec2}/4`;
+    document.getElementById('sec3-score').textContent = `${sec3}/4`;
+    document.getElementById('sec4-score').textContent = `${sec4}/4`;
+    document.getElementById('sec5-score').textContent = `${sec5}/4`;
+
+    const badge = document.getElementById('success-badge');
+    document.getElementById('success-percent').textContent = `${successRate}%`;
+
+    if (currentLang === 'ar') {
+        if (successRate >= 90) { badge.textContent = 'ممتاز'; badge.className = 'success-badge grade-excellent'; }
+        else if (successRate >= 75) { badge.textContent = 'جيد جداً'; badge.className = 'success-badge grade-good'; }
+        else if (successRate >= 50) { badge.textContent = 'جيد'; badge.className = 'success-badge grade-pass'; }
+        else { badge.textContent = 'يحتاج تحسين'; badge.className = 'success-badge grade-fail'; }
+    } else {
+        if (successRate >= 90) { badge.textContent = 'Excellent'; badge.className = 'success-badge grade-excellent'; }
+        else if (successRate >= 75) { badge.textContent = 'Very Good'; badge.className = 'success-badge grade-good'; }
+        else if (successRate >= 50) { badge.textContent = 'Good'; badge.className = 'success-badge grade-pass'; }
+        else { badge.textContent = 'Needs Improvement'; badge.className = 'success-badge grade-fail'; }
+    }
+
+    document.getElementById('results-panel').classList.remove('hidden');
+    document.getElementById('results-panel').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('sendEmailBtn').classList.remove('hidden');
+}
+
+// ==================== إرسال النتائج بالإيميل ====================
+function sendResultsToEmail() {
+    const btn = document.getElementById('sendEmailBtn');
+    const status = document.getElementById('emailStatus');
+    btn.disabled = true;
+    btn.textContent = currentLang === 'ar' ? '⏳ جاري الإرسال...' : '⏳ Sending...';
+
+    const name = document.getElementById('studentName').value || 'N/A';
+    const studentClass = document.getElementById('studentClass').value || 'N/A';
+    const date = document.querySelector('input[type="text"]').value || new Date().toLocaleDateString();
+    const score = document.getElementById('res-total').textContent;
+    const successRate = document.getElementById('success-percent').textContent;
+    const badge = document.getElementById('success-badge').textContent;
+
+    const sectionNames = {
+        ar: ['الأزمة الأولى: الطاقة اللانهائية', 'حل بلانك: تكميم الطاقة', 'الأزمة الثانية: التأثير الكهروضوئي', 'حل أينشتاين: الفوتونات', 'إثباتات إضافية: كومبتون'],
+        en: ['The First Crisis: Infinite Energy', 'Planck\'s Fix: Quantized Energy', 'The Second Crisis: Photoelectric Effect', 'Einstein\'s Solution: Photons', 'Additional Proofs: Compton']
+    };
+    const currentSectionNames = sectionNames[currentLang];
+
+    let answersHTML = `
+        <div style="font-family: 'Segoe UI', Tahoma, Arial, sans-serif; direction: ${currentLang === 'ar' ? 'rtl' : 'ltr'};">
+            <div style="background: linear-gradient(135deg, #7c3aed, #ec4899); color: white; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
+                <h2 style="margin: 0; font-size: 22px;">💡 ${currentLang === 'ar' ? 'نتيجة امتحان النظرية الكمية' : 'Quantum Theory Exam Result'}</h2>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">${currentLang === 'ar' ? 'الصف الثاني عشر متقدم - Inspire | الوحدة الأولى' : 'Grade 12 Advanced - Inspire | Unit 1'}</p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.8;">🔀 ${currentLang === 'ar' ? 'تم خلط الأسئلة تلقائياً' : 'Questions were randomly shuffled'}</p>
+            </div>
+            
+            <div style="background: #f5f3ff; padding: 15px; border: 1px solid #ddd6fe;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold; color: #6d28d9;">${currentLang === 'ar' ? '👤 الاسم:' : '👤 Name:'}</td>
+                        <td style="padding: 8px;">${name}</td>
+                        <td style="padding: 8px; font-weight: bold; color: #6d28d9;">${currentLang === 'ar' ? '🏫 الشعبة:' : '🏫 Class:'}</td>
+                        <td style="padding: 8px;">${studentClass}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold; color: #6d28d9;">${currentLang === 'ar' ? '📅 التاريخ:' : '📅 Date:'}</td>
+                        <td style="padding: 8px;">${date}</td>
+                        <td style="padding: 8px; font-weight: bold; color: #6d28d9;">${currentLang === 'ar' ? '🏆 التقدير:' : '🏆 Grade:'}</td>
+                        <td style="padding: 8px;">${badge}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="background: white; padding: 20px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+                <div style="display: inline-block; margin: 0 15px;">
+                    <div style="font-size: 32px; font-weight: bold; color: #7c3aed;">${score}</div>
+                    <div style="color: #6b7280; font-size: 13px;">${currentLang === 'ar' ? 'الدرجة الكلية' : 'Total Score'}</div>
+                </div>
+                <div style="display: inline-block; margin: 0 15px;">
+                    <div style="font-size: 32px; font-weight: bold; color: #059669;">${successRate}%</div>
+                    <div style="color: #6b7280; font-size: 13px;">${currentLang === 'ar' ? 'نسبة النجاح' : 'Success Rate'}</div>
+                </div>
+            </div>
+
+            <h3 style="background: #f3f4f6; padding: 12px; margin: 0; color: #1f2937; border-bottom: 2px solid #d1d5db;">
+                📝 ${currentLang === 'ar' ? 'تفاصيل الإجابات' : 'Answer Details'}
+            </h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                    <tr style="background: #7c3aed; color: white;">
+                        <th style="padding: 10px; border: 1px solid #6d28d9; width: 8%;">#</th>
+                        <th style="padding: 10px; border: 1px solid #6d28d9; width: 32%;">${currentLang === 'ar' ? 'القسم' : 'Section'}</th>
+                        <th style="padding: 10px; border: 1px solid #6d28d9; width: 15%;">${currentLang === 'ar' ? 'الإجابة' : 'Answer'}</th>
+                        <th style="padding: 10px; border: 1px solid #6d28d9; width: 15%;">${currentLang === 'ar' ? 'الصحيحة' : 'Correct'}</th>
+                        <th style="padding: 10px; border: 1px solid #6d28d9; width: 15%;">${currentLang === 'ar' ? 'النتيجة' : 'Status'}</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    let sectionScores = [0, 0, 0, 0, 0];
+    let sectionTotals = [4, 4, 4, 4, 4];
+
+    for (let i = 1; i <= 20; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        const selectedValue = selected ? selected.value : '-';
+        const correctValue = correctAnswersMap[i];
+        const isCorrect = selectedValue === correctValue;
+        
+        const sectionIndex = Math.floor((i - 1) / 4);
+        if (isCorrect) sectionScores[sectionIndex]++;
+
+        const rowBg = i % 2 === 0 ? '#f9fafb' : '#ffffff';
+        const statusBg = isCorrect ? '#dcfce7' : '#fee2e2';
+        const statusColor = isCorrect ? '#166534' : '#991b1b';
+        const statusIcon = isCorrect ? '✅' : '❌';
+        const statusText = isCorrect 
+            ? (currentLang === 'ar' ? 'صحيح' : 'Correct') 
+            : (currentLang === 'ar' ? 'خطأ' : 'Wrong');
+
+        answersHTML += `
+            <tr style="background: ${rowBg};">
+                <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: center; font-weight: bold;">${i}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb;">${currentSectionNames[sectionIndex]}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: center; font-weight: bold;">${selectedValue.toUpperCase()}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: center; font-weight: bold; color: #059669;">${correctValue.toUpperCase()}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: center; background: ${statusBg}; color: ${statusColor}; font-weight: bold;">
+                    ${statusIcon} ${statusText}
+                </td>
+            </tr>
+        `;
+    }
+
+    answersHTML += `
+                </tbody>
+            </table>
+
+            <h3 style="background: #f3f4f6; padding: 12px; margin: 0; color: #1f2937; border-bottom: 2px solid #d1d5db; border-top: 3px solid #7c3aed;">
+                📊 ${currentLang === 'ar' ? 'تفصيل الأداء حسب القسم' : 'Performance Breakdown by Section'}
+            </h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                    <tr style="background: #ec4899; color: white;">
+                        <th style="padding: 10px; border: 1px solid #db2777;">${currentLang === 'ar' ? 'القسم' : 'Section'}</th>
+                        <th style="padding: 10px; border: 1px solid #db2777; width: 20%;">${currentLang === 'ar' ? 'النتيجة' : 'Score'}</th>
+                        <th style="padding: 10px; border: 1px solid #db2777; width: 20%;">${currentLang === 'ar' ? 'النسبة' : 'Percentage'}</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    for (let i = 0; i < 5; i++) {
+        const percentage = Math.round((sectionScores[i] / sectionTotals[i]) * 100);
+        const barColor = percentage >= 75 ? '#10b981' : percentage >= 50 ? '#f59e0b' : '#ef4444';
+        const rowBg = i % 2 === 0 ? '#f9fafb' : '#ffffff';
+        
+        answersHTML += `
+            <tr style="background: ${rowBg};">
+                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: 600;">${currentSectionNames[i]}</td>
+                <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: center; font-weight: bold; color: #7c3aed;">
+                    ${sectionScores[i]} / ${sectionTotals[i]}
+                </td>
+                <td style="padding: 10px; border: 1px solid #e5e7eb;">
+                    <div style="background: #e5e7eb; border-radius: 10px; overflow: hidden; height: 20px; position: relative;">
+                        <div style="background: ${barColor}; width: ${percentage}%; height: 100%; transition: width 0.5s;"></div>
+                        <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 11px; font-weight: bold; color: #1f2937;">
+                            ${percentage}%
+                        </span>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    answersHTML += `
+                </tbody>
+            </table>
+
+            <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 15px; border-radius: 0 0 10px 10px; border-top: 2px solid #f59e0b;">
+                <p style="margin: 0; color: #78350f; text-align: center; font-size: 13px;">
+                    💡 <strong>${currentLang === 'ar' ? 'ملاحظة:' : 'Note:'}</strong> 
+                    ${currentLang === 'ar' 
+                        ? 'تم إرسال هذا التقرير تلقائياً من منصة 4U التعليمية | Mr. Mohammed Hesham' 
+                        : 'This report was automatically sent from 4U Educational Platform | Mr. Mohammed Hesham'}
+                </p>
+            </div>
+        </div>
+    `;
+
+    const templateParams = {
+        to_email: "mohammedhesham872@gmail.com",
+        student_name: name,
+        student_class: studentClass,
+        exam_date: date,
+        total_score: score,
+        success_rate: successRate,
+        grade: badge,
+        answers_table: answersHTML
+    };
+
+    emailjs.send("service_w15m64i", "template_5b0u2tq", templateParams)
+        .then(() => {
+            status.textContent = currentLang === 'ar' 
+                ? '✅ تم إرسال النتائج بنجاح!' 
+                : '✅ Results sent successfully!';
+            status.style.color = '#059669';
+            btn.textContent = currentLang === 'ar' ? '✓ تم الإرسال' : '✓ Sent';
+        })
+        .catch(err => {
+            status.textContent = currentLang === 'ar' 
+                ? '❌ فشل الإرسال، حاول مرة أخرى' 
+                : '❌ Failed to send, try again';
+            status.style.color = '#dc2626';
+            btn.disabled = false;
+            btn.textContent = currentLang === 'ar' ? '📧 إعادة المحاولة' : '📧 Retry Send';
+            console.error('EmailJS Error:', err);
+        });
+}
+
+// ==================== التهيئة عند تحميل الصفحة ====================
+window.addEventListener('DOMContentLoaded', () => {
+    prepareShuffledExam();
+    renderExam();
+    startTimer();
+    
+    console.log('🔀 تم خلط الأسئلة والخيارات عشوائياً!');
+    console.log('📋 خريطة الإجابات الصحيحة:', correctAnswersMap);
+});
+
+// ==================== اختصارات لوحة المفاتيح ====================
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('lessonModal');
+        if (modal && !modal.classList.contains('hidden')) {
+            closeLessonModal();
+        }
+    }
+});
+</script>
+</body>
+</html>
